@@ -1,11 +1,11 @@
 import time
-import pygame
 import socket
 import _thread as t
 import pickle
-import io
-import cv2
-import struct
+from Task_Crack_Detection.crackmeasurement import crack
+from Task_Shape_Detection.Shape_Detection import shape
+#from Task_Text_Detection.text_detect import *
+
 
 server_address = ('192.168.1.168', 5001)
 
@@ -64,7 +64,7 @@ def get():
     data = pickle.dumps(s)
     return data
 
-def send():
+def send_controller_data():
     sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock1.bind(server_address)
     sock1.listen(5)
@@ -73,42 +73,48 @@ def send():
         conn.send(get())
         time.sleep(.01)
         
-def recv():
+def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock2.connect(('192.168.1.167',5002))
+    
     while True:
         msg=sock2.recv(1024)
         msg1 = pickle.loads(msg)
         print("Received:",msg1)
         time.sleep(.01)
 
-def camera():
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('192.168.1.167', 5003))
 
-    cam = cv2.VideoCapture(0)
 
-    cam.set(3, 320);
-    cam.set(4, 240);
-
-    img_counter = 0
-
-    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+def recv_frame():
+    HOST='192.168.1.168'
+    PORT=5003    
+    s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.bind((HOST,PORT))
+    s.listen(10)
+    conn,addr=s.accept()
+    data = b""
+    payload_size = struct.calcsize(">L")
 
     while True:
-        ret, frame = cam.read()
-        result, frame = cv2.imencode('.jpg', frame, encode_param)
-        data = pickle.dumps(frame, 0)
-        size = len(data)
+        while len(data) < payload_size:
+            data += conn.recv(4096)
+        packed_msg_size = data[:payload_size]
+        data = data[payload_size:]
+        msg_size = struct.unpack(">L", packed_msg_size)[0]
+        while len(data) < msg_size:
+            data += conn.recv(4096)
+        frame_data = data[:msg_size]
+        data = data[msg_size:]
+        frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
+        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+        h,w = frame.shape[:2]
+        frame1=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)   
+        #cv2.imshow('ImageWindow',frame1)
+        '''crack(frame)'''
+        '''shape(frame)'''
+        cv2.waitKey(1)
+    
 
-
-        print("{}: {}".format(img_counter, size))
-        client_socket.sendall(struct.pack(">L", size) + data)
-        img_counter += 1
-
-    cam.release()
-
-t.start_new_thread(send, ())
-t.start_new_thread(recv, ())
-t.start_new_thread(camera, ())
-
+t.start_new_thread(send_controller_data, ())
+t.start_new_thread(recv_sensor_values, ())
+t.start_new_thread(recv_frame, ())
