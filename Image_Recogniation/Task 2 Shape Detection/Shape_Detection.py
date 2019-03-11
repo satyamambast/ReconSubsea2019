@@ -12,7 +12,7 @@ while(1):
     _, frame = cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0,0,0])
-    upper = np.array([180,255,30])
+    upper = np.array([180,255,35]) #180,255,30
     mask = cv2.inRange(hsv, lower, upper)
     res = cv2.bitwise_and(frame,frame, mask= mask)
     maskOpen=cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernelOpen)
