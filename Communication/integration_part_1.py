@@ -84,7 +84,7 @@ def send():
         
 def recv():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock2.connect(('192.168.1.169',5002))
+    sock2.connect(('192.168.1.167',5002))
     while True:
         msg=sock2.recv(1024)
         msg1 = pickle.loads(msg)
@@ -96,7 +96,7 @@ def distanceformula(x1,y1,x2,y2):
 
 def camera():
     client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(('192.168.1.169', 5003))
+    client_socket.connect(('192.168.1.167', 5003))
 
     cam = cv2.VideoCapture(0)
 

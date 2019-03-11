@@ -4,7 +4,7 @@ from shape_detect.shapedetector import ShapeDetector
 import imutils
 
 #frame=cv2.imread("shapes2.jpg")
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 kernelOpen=np.ones((5,5))
 kernelClose=np.ones((20,20))
 
