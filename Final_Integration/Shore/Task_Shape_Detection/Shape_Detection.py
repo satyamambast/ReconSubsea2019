@@ -8,7 +8,7 @@ import struct
 def shape(frame):
     kernelOpen=np.ones((5,5))
     kernelClose=np.ones((20,20))
-    dataset=[]      
+    dataset=[]
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([0,0,0])
     upper = np.array([180,255,30])

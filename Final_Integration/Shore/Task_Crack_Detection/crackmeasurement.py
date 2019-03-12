@@ -11,12 +11,12 @@ import socket
 
 def distanceformula(x1,y1,x2,y2):
     return(sqrt((x1-x2)**2 + (y1-y2)**2)) 
+
 def crack(frame):
     kernelOpen=np.ones((5,5))
     kernelClose=np.ones((20,20))
     crack_length=0
     k=1.5
-    dataset=[]
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([80,100,100])
     upper = np.array([120,250,250])
@@ -39,11 +39,6 @@ def crack(frame):
         else:
             crack1=((b/l)*k)
         print(crack1)
-        dataset.append(round(crack1,1))
-    if len(conts)==0 and len(dataset)!=0:
-        crack_length=mean(dataset)
-        dataset=[]
-    if crack_length!=0:
-        cv2.putText(frame, str(round(crack_length,1)), (100, 100), cv2.FONT_HERSHEY_SIMPLEX,0.5, (255, 255, 255), 2)
     cv2.imshow('crack',frame)
+
 

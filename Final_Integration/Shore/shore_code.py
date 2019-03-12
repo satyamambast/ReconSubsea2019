@@ -2,6 +2,7 @@ import time
 import socket
 import _thread as t
 import pickle
+import pygame
 from Task_Crack_Detection.crackmeasurement import crack
 from Task_Shape_Detection.Shape_Detection import shape
 #from Task_Text_Detection.text_detect import *
@@ -110,7 +111,7 @@ def recv_frame():
         h,w = frame.shape[:2]
         frame1=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)   
         #cv2.imshow('ImageWindow',frame1)
-        '''crack(frame)'''
+        crack(frame)
         '''shape(frame)'''
         cv2.waitKey(1)
     
