@@ -5,9 +5,10 @@ import pickle
 import numpy as np
 import struct 
 import zlib
+from Testing.failure import crack
 
-HOST=''
-PORT=8485
+HOST='192.168.1.168'
+PORT=5003
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
@@ -43,5 +44,6 @@ while True:
 
     frame1=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)   
     
-    cv2.imshow('ImageWindow',frame1)
+    #cv2.imshow('ImageWindow',frame1)
+    crack(frame)
     cv2.waitKey(1)
