@@ -1,14 +1,13 @@
 import time
 import socket
-import _thread as t
+import threading
 import pickle
 import pygame
-from Task_Crack_Detection.crackmeasurement import crack
-from Task_Shape_Detection.Shape_Detection import shape
+#from Task_Crack_Detection.crackmeasurement import crack
+#from Task_Shape_Detection.Shape_Detection import shape
 #from Task_Text_Detection.text_detect import *
 
-
-server_address = ('192.168.1.168', 5001)
+server_address = ('192.168.2.1', 5059)
 
 pygame.init()
 j = pygame.joystick.Joystick(0)
@@ -61,33 +60,42 @@ def get():
     out[0]=out[0]*10
     out[3]=out[3]*10
     out[4]=out[4]*10
-    s=str(out).strip('[]')
-    data = pickle.dumps(s)
+    #s=str(out).strip('[]')
+    s=out
+    data = pickle.dumps(s,1)
     return data
+
 
 def send_controller_data():
     sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock1.bind(server_address)
     sock1.listen(5)
     conn,addr = sock1.accept()
-    while True:    
+    while True:
+        #s = get()
+        #t = int(input('Enter 0 to 7-->\n'))
+        #s = s.append(t)
+        #s = str(s).strip('[]')
+        #print(s)
+        #data = pickle.dumps(s,1)
         conn.send(get())
         time.sleep(.01)
         
 def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock2.connect(('192.168.1.167',5002))
+    sock2.connect(('192.168.2.2',5058))
     
     while True:
         msg=sock2.recv(1024)
-        msg1 = pickle.loads(msg)
-        print("Received:",msg1)
+        if len(msg)>0 :
+            msg1 = pickle.loads(msg,encoding='bytes')
+            print("Received:",msg1)
         time.sleep(.01)
 
 
-
+'''
 def recv_frame():
-    HOST='192.168.1.168'
+    HOST='192.168.2.1'
     PORT=5003    
     s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     s.bind((HOST,PORT))
@@ -110,12 +118,16 @@ def recv_frame():
         frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
         h,w = frame.shape[:2]
         frame1=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)   
-        #cv2.imshow('ImageWindow',frame1)
+        cv2.imshow('ImageWindow',frame1)
         crack(frame)
-        '''shape(frame)'''
+        shape(frame)
         cv2.waitKey(1)
-    
+'''
 
-t.start_new_thread(send_controller_data, ())
-t.start_new_thread(recv_sensor_values, ())
-t.start_new_thread(recv_frame, ())
+send_cont = threading.Thread(target = send_controller_data, args = ())
+recv_sense = threading.Thread(target = recv_sensor_values, args = ())
+#recv_cam = threading.Thread(target = recv_frame, args = ())
+
+send_cont.start()
+recv_sense.start()
+#recv_cam.start()
