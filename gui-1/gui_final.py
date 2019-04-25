@@ -39,6 +39,8 @@ se1=0
 clk=0
 num1=0
 i1=0
+i2=0
+num2=0
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_MainWindow(object):
@@ -142,8 +144,8 @@ class Ui_MainWindow(object):
         self.pushButton_4.clicked.connect(self.m)
         self.pushButton_6.clicked.connect(self.m1)
         self.checkBox.clicked.connect(self.task2)
-        self.checkBox_2.clicked.connect(self.task2)
-        self.checkBox_3.clicked.connect(self.task2)
+        self.checkBox_2.clicked.connect(self.task3)
+        self.checkBox_3.clicked.connect(self.task4)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
@@ -159,68 +161,9 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(_translate("MainWindow", "SHAPE DETECTION"))
         self.pushButton_5.setText(_translate("MainWindow", "MINI ROV LIVE FEED"))
         self.pushButton_6.setText(_translate("MainWindow", "CRACK DETECTION"))
-    '''def task2(self):
-        global num
-        global i
-        global i1
-        global i2
-        global num1
-        global num2
-        global clk
-        if self.checkBox.isChecked():
-            print('a')
-        if clk==1 and (self.checkBox_2.isChecked()==False and self.checkBox_3.isChecked()==False):
-            self.lcdNumber_4.display(str(num)+":"+str(i))
-            num1=num
-            i1=i
-        if clk==1 and (self.checkBox_2.isChecked()==False and self.checkBox.isChecked()==False):
-            self.lcdNumber_6.display(str(num)+":"+str(i))
-            num1=num
-            i1=i
-        if clk==1 and(self.checkBox_3.isChecked()==False and self.checkBox.isChecked()==False):
-            self.lcdNumber_5.display(str(num)+":"+str(i))
-            num1=num
-            i1=i
-        if clk==2 and self.checkBox.isChecked() and self.checkBox_2.isChecked():
-            self.lcdNumber_5.display(str(num-num1)+":"+str(i-i1))
-        if clk==2 and self.checkBox.isChecked() and self.checkBox_3.isChecked():
-            self.lcdNumber_6.display(str(num-num1)+":"+str(i-i1))
-        if clk==2 and self.checkBox_2.isChecked() and self.sheckBox.isChecked():
-            self.lcdNumber_4.display(str(num-num1)+":"+str(i-i1))
-        if clk==2 and self.checkBox_2.isChecked() and self.sheckBox_3.isChecked():
-            self.lcdNumber_5.display(str(num-num1)+":"+str(i-i1))
-        if clk==2 and self.checkBox_3.isChecked() and self.sheckBox.isChecked():
-            self.lcdNumber_5.display(str(num-num1)+":"+str(i-i1))
-        if clk==2 and self.checkBox_3.isChecked() and self.sheckBox_2.isChecked():
-            self.lcdNumber_4.display(str(num-num1)+":"+str(i-i1))'''
         
-    def task1(self):
-        global num
-        global i
-        global mi
-        global se
-        global cb
-        global mi1
-        global se1
-        cb=cb+1
-        print(cb)
-        if cb==1:
-            #self.lcdNumber_4.display(str(num)+":"+str(i))
-            mi1 = num
-            se1 = i
-        if cb==1 and cb1==1:
-            mi1 = num-mi
-            se1 = i-se
-            self.lcdNumber_4.display(str(mi1)+":"+str(se1))
-    '''def tasks(self):
-        clk=clk+1
-        if self.checkBox_2.isChecked() and self.checkBox.isChecked()==False and self.checkBox_3.isChecked==False:
-            self.lcdNumber_5.display(str(num)+":"+str(i))
-        if self.checkBox.isChecked() and self.checkBox_2.isChecked()==False and self.checkBox_3.isChecked()==False:
-            self.lcdNumber_4.display(str(num)+":"+str(i))
-        if self.checkBox_3.isChecked() and self.checkBox_2.isChecked()==False and self.checkBox.isChecked()==False:
-            self.lcdNumber_6.display(str(num)+":"+str(i))
-        if self.check'''
+   
+    
     def livefeed(self):
         t1 = threading.Thread(target = self.x)
         t1.start()
@@ -254,12 +197,99 @@ class Ui_MainWindow(object):
                 self.lcdNumber.display(str(num)+":"+str(i))
             i=i+1
             time.sleep(1)
-    '''def text_detection(self,ret,frame):
-        global config
-        print(ret)
-        text = pytesseract.image_to_string(frame, config=config)
-        #cv2.imshow('frame',frame)
-        print(text)'''
+    def task(self):
+        global num1
+        global num
+        global clk
+        global i
+        global i1
+        clk=clk+1
+        if self.checkBox.isChecked() and clk==1:
+            self.lcdNumber_4.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+            self.checkBox.setEnabled(False)
+        if self.checkBox_2.isChecked() and clk==1:
+            self.lcdNumber_5.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+            self.checkBox_2.setEnabled(False)
+        if self.checkBox_3.isChecked() and clk==1:
+            self.lcdNumber_6.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+            self.checkBox_3.setEnabled(False)
+    def task2(self):
+        global clk
+        global num1
+        global i1
+        global num2
+        global i2
+        global num3
+        global i3
+        clk=clk+1
+        print(clk)
+        if clk==1:
+            self.lcdNumber_4.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+        if clk==2:
+            num2=num-num1
+            i2=i-i1
+            num3=num
+            i3=i
+            self.lcdNumber_4.display(str(num2)+":"+str(i2))
+            
+        if clk==3:
+            
+            self.lcdNumber_4.display(str(num-num3)+":"+str(i-i3))
+        time.sleep(1)
+    def task3(self):
+        global clk
+        global num1
+        global i1
+        global num2
+        global i2
+        global num3
+        global i3
+        clk=clk+1
+        print(clk)
+        if clk==1:
+            self.lcdNumber_5.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+        if clk==2:
+            num2=num-num1
+            i2=i-i1
+            self.lcdNumber_5.display(str(num2)+":"+str(i2))
+            num3=num
+            i3=i
+        if clk==3:
+            self.lcdNumber_5.display(str(num-num3)+":"+str(i-i3))
+        time.sleep(1)
+    def task4(self):
+        global clk
+        global num1
+        global i1
+        global num2
+        global i2
+        global num3
+        global i3
+        clk=clk+1
+        print(clk)
+        if clk==1:
+            self.lcdNumber_6.display(str(num)+":"+str(i))
+            num1=num
+            i1=i
+        if clk==2:
+            num2=num-num1
+            i2=i-i1
+            self.lcdNumber_6.display(str(num2)+":"+str(i2))
+            num3=num
+            i3=i
+        if clk==3:
+            self.lcdNumber_6.display(str(num-num3)+":"+str(i-i3))
+        time.sleep(1)
     def shapesdetect(self):
         cv2.destroyAllWindows()
         cap = cv2.VideoCapture(1)
