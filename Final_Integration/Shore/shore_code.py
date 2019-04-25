@@ -32,17 +32,17 @@ class MultiCam:
             result, self.frame4 = cv2.imencode('.jpg', frame4, encode_param)            
 
     def displayallfeeds(self):
-	if self.ret1:	
- 	    cv2.imshow('cam1',self.decode(self.frame1))
-	if self.ret2:
-	    cv2.imshow('cam2',self.decode(self.frame2))
-	if self.ret3:
-	    cv2.imshow('cam3',self.decode(self.frame3))
-	if self.ret4:
-	    cv2.imshow('cam4',self.decode(self.frame4))
-	cv2.waitKey(1)
+        if self.ret1:	
+            cv2.imshow('cam1',self.decode(self.frame1))
+        if self.ret2:
+            cv2.imshow('cam2',self.decode(self.frame2))
+        if self.ret3:
+            cv2.imshow('cam3',self.decode(self.frame3))
+        if self.ret4:
+            cv2.imshow('cam4',self.decode(self.frame4))
+        cv2.waitKey(1)`
     def decode(self,frame):
-	frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+	    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
         h,w = frame.shape[:2]
         framea=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)
 	return framea
