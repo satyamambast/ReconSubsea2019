@@ -1,14 +1,53 @@
 import time
 import socket
-import _thread as t
+import threading
 import pickle
 import pygame
-from Task_Crack_Detection.crackmeasurement import crack
-from Task_Shape_Detection.Shape_Detection import shape
+#from Task_Crack_Detection.crackmeasurement import crack
+#from Task_Shape_Detection.Shape_Detection import shape
 #from Task_Text_Detection.text_detect import *
+class MultiCam:
+    encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
+    def __init__(self):
+        self.frame1=None
+        self.frame2=None
+        self.frame3=None
+        self.frame4=None
+        self.ret1=False
+        self.ret2=False
+        self.ret3=False
+        self.ret4=False
+    def encodepossible(self,cam1,cam2,cam3,cam4):
+        self.ret1, frame1 = cam1.read()
+        self.ret2, frame2 = cam2.read()
+        self.ret3, frame3 = cam3.read()
+        self.ret4, frame4 = cam4.read()
+        if ret1:
+            result, self.frame1 = cv2.imencode('.jpg', frame1, encode_param)            
+        elif ret2:
+            result, self.frame2 = cv2.imencode('.jpg', frame2, encode_param)            
+        elif ret3:
+            result, self.frame3 = cv2.imencode('.jpg', frame3, encode_param)            
+        elif ret3:
+            result, self.frame4 = cv2.imencode('.jpg', frame4, encode_param)            
 
+    def displayallfeeds(self):
+        if self.ret1:	
+            cv2.imshow('cam1',self.decode(self.frame1))
+        if self.ret2:
+            cv2.imshow('cam2',self.decode(self.frame2))
+        if self.ret3:
+            cv2.imshow('cam3',self.decode(self.frame3))
+        if self.ret4:
+            cv2.imshow('cam4',self.decode(self.frame4))
+        cv2.waitKey(1)`
+    def decode(self,frame):
+	    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+        h,w = frame.shape[:2]
+        framea=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)
+	return framea
 
-server_address = ('192.168.1.168', 5001)
+server_address = ('192.168.2.1', 5059)
 
 pygame.init()
 j = pygame.joystick.Joystick(0)
@@ -61,33 +100,42 @@ def get():
     out[0]=out[0]*10
     out[3]=out[3]*10
     out[4]=out[4]*10
-    s=str(out).strip('[]')
-    data = pickle.dumps(s)
+    #s=str(out).strip('[]')
+    s=out
+    data = pickle.dumps(s,1)
     return data
+
 
 def send_controller_data():
     sock1 = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock1.bind(server_address)
     sock1.listen(5)
     conn,addr = sock1.accept()
-    while True:    
+    while True:
+        #s = get()
+        #t = int(input('Enter 0 to 7-->\n'))
+        #s = s.append(t)
+        #s = str(s).strip('[]')
+        #print(s)
+        #data = pickle.dumps(s,1)
         conn.send(get())
         time.sleep(.01)
         
 def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock2.connect(('192.168.1.167',5002))
+    sock2.connect(('192.168.2.2',5058))
     
     while True:
         msg=sock2.recv(1024)
-        msg1 = pickle.loads(msg)
-        print("Received:",msg1)
+        if len(msg)>0 :
+            msg1 = pickle.loads(msg,encoding='bytes')
+            print("Received:",msg1)
         time.sleep(.01)
 
 
 
 def recv_frame():
-    HOST='192.168.1.168'
+    HOST='192.168.2.1'
     PORT=5003    
     s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     s.bind((HOST,PORT))
@@ -106,16 +154,20 @@ def recv_frame():
             data += conn.recv(4096)
         frame_data = data[:msg_size]
         data = data[msg_size:]
-        frame=pickle.loads(frame_data, fix_imports=True, encoding="bytes")
-        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
-        h,w = frame.shape[:2]
-        frame1=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)   
-        #cv2.imshow('ImageWindow',frame1)
-        crack(frame)
-        '''shape(frame)'''
-        cv2.waitKey(1)
-    
+        obj=pickle.loads(frame_data,encoding='bytes')
+        obj.frame1=obj.__dict__[b'frame1']
+        obj.frame2=obj.__dict__[b'frame2']
+    	obj.frame3=obj.__dict__[b'frame3']
+    	obj.frame4=obj.__dict__[b'frame4']
+        obj.ret1=obj.__dict__[b'ret1']
+        obj.ret2=obj.__dict__[b'ret2']
+    	obj.ret3=obj.__dict__[b'ret3']
+    	obj.ret4=obj.__dict__[b'ret4']
+	obj.displayallfeeds()
+send_cont = threading.Thread(target = send_controller_data, args = ())
+recv_sense = threading.Thread(target = recv_sensor_values, args = ())
+#recv_cam = threading.Thread(target = recv_frame, args = ())
 
-t.start_new_thread(send_controller_data, ())
-t.start_new_thread(recv_sensor_values, ())
-t.start_new_thread(recv_frame, ())
+send_cont.start()
+recv_sense.start()
+#recv_cam.start()

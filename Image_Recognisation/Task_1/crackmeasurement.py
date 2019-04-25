@@ -3,7 +3,7 @@ import numpy as np
 import time 
 from math import sqrt
 from statistics import mode,mean
-cap=cv2.VideoCapture(0)
+cap=cv2.VideoCapture(1)
 kernelOpen=np.ones((5,5))
 kernelClose=np.ones((20,20))
 crack_length=0
@@ -14,7 +14,7 @@ def distanceformula(x1,y1,x2,y2):
 def findmean():
     global dataset
     if len(dataset)!=0:
-        crac=mean(dataset)
+        crac=mode(dataset)
         dataset=[]
     else:
         crac=0
@@ -23,8 +23,8 @@ def findmean():
 while True:
     _,frame=cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-    lower = np.array([80,100,0])
-    upper = np.array([120,250,250])
+    lower = np.array([-8,100,0])
+    upper = np.array([9,250,250])
     mask = cv2.inRange(hsv, lower, upper)
     res = cv2.bitwise_and(frame,frame, mask= mask)
     maskOpen=cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernelOpen)
@@ -43,9 +43,13 @@ while True:
             crack1=((l/b)*k)
         else:
             crack1=((b/l)*k)
+        print(crack1)
 
         dataset.append(round(crack1,1))  
     cv2.imshow('f',frame)
-    cv2.waitKey(1)
-    
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        cv2.destroyAllWindows()
+        cap.release()
+        print(findmean())
+        break
 
