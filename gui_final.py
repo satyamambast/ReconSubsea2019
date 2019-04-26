@@ -2,8 +2,9 @@ import cv2
 import numpy as np
 import time 
 from math import sqrt
-from Task_Character_Detection.detect2 import *
-from shape_detect.shapedetector import ShapeDetector
+#import pytesseract
+#from Task_Character_Detection.detect2 import *
+#from shape_detect.shapedetector import ShapeDetector
 from statistics import mode,mean
 import threading
 import os
