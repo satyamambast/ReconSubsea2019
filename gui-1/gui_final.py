@@ -2,9 +2,9 @@ import cv2
 import numpy as np
 import time 
 from math import sqrt
-import pytesseract
-from Task_Character_Detection.detect2 import *
-from shape_detect.shapedetector import ShapeDetector
+#import pytesseract
+#from Task_Character_Detection.detect2 import *
+#from shape_detect.shapedetector import ShapeDetector
 from statistics import mode,mean
 import threading
 import os
@@ -159,7 +159,7 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(_translate("MainWindow", "SHAPE DETECTION"))
         self.pushButton_5.setText(_translate("MainWindow", "MINI ROV LIVE FEED"))
         self.pushButton_6.setText(_translate("MainWindow", "CRACK DETECTION"))
-    '''def task2(self):
+    def task2(self):
         global num
         global i
         global i1
@@ -192,7 +192,7 @@ class Ui_MainWindow(object):
         if clk==2 and self.checkBox_3.isChecked() and self.sheckBox.isChecked():
             self.lcdNumber_5.display(str(num-num1)+":"+str(i-i1))
         if clk==2 and self.checkBox_3.isChecked() and self.sheckBox_2.isChecked():
-            self.lcdNumber_4.display(str(num-num1)+":"+str(i-i1))'''
+            self.lcdNumber_4.display(str(num-num1)+":"+str(i-i1))
         
     def task1(self):
         global num
@@ -294,12 +294,12 @@ class Ui_MainWindow(object):
         cap = cv2.VideoCapture(0)
         while True:
                 ret,frame = cap.read()
-                cv2.imwrite('C:/python/camera0/frame%d.jpg' % count,frame)
+                '''cv2.imwrite('C:/python/camera0/frame%d.jpg' % count,frame)
                 self.label.setPixmap(QtGui.QPixmap('C:/python/camera0/frame%d.jpg' % count))
                 os.remove('C:/python/camera0/frame%d.jpg' % count)
                 count=count+1
-                time.sleep(.01)
-                #cv2.imshow('frame0',frame)
+                time.sleep(.01)'''
+                cv2.imshow('frame0',frame)
                 k=cv2.waitKey(1)
                 if k==1:
                     break

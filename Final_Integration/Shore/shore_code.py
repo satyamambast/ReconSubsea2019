@@ -3,6 +3,7 @@ import socket
 import threading
 import pickle
 import pygame
+import cv2
 #from Task_Crack_Detection.crackmeasurement import crack
 #from Task_Shape_Detection.Shape_Detection import shape
 #from Task_Text_Detection.text_detect import *
@@ -40,12 +41,12 @@ class MultiCam:
             cv2.imshow('cam3',self.decode(self.frame3))
         if self.ret4:
             cv2.imshow('cam4',self.decode(self.frame4))
-        cv2.waitKey(1)`
+        cv2.waitKey(1)
     def decode(self,frame):
-	    frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
+        frame = cv2.imdecode(frame, cv2.IMREAD_COLOR)
         h,w = frame.shape[:2]
         framea=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)
-	return framea
+        return framea
 
 server_address = ('192.168.2.1', 5059)
 
@@ -157,17 +158,17 @@ def recv_frame():
         obj=pickle.loads(frame_data,encoding='bytes')
         obj.frame1=obj.__dict__[b'frame1']
         obj.frame2=obj.__dict__[b'frame2']
-    	obj.frame3=obj.__dict__[b'frame3']
-    	obj.frame4=obj.__dict__[b'frame4']
+        obj.frame3=obj.__dict__[b'frame3']
+        obj.frame4=obj.__dict__[b'frame4']
         obj.ret1=obj.__dict__[b'ret1']
         obj.ret2=obj.__dict__[b'ret2']
-    	obj.ret3=obj.__dict__[b'ret3']
-    	obj.ret4=obj.__dict__[b'ret4']
-	obj.displayallfeeds()
+        obj.ret3=obj.__dict__[b'ret3']
+        obj.ret4=obj.__dict__[b'ret4']
+        obj.displayallfeeds()
 send_cont = threading.Thread(target = send_controller_data, args = ())
 recv_sense = threading.Thread(target = recv_sensor_values, args = ())
-#recv_cam = threading.Thread(target = recv_frame, args = ())
+recv_cam = threading.Thread(target = recv_frame, args = ())
 
 send_cont.start()
 recv_sense.start()
-#recv_cam.start()
+recv_cam.start()
