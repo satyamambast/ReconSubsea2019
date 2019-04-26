@@ -3,7 +3,6 @@ import numpy as np
 import time 
 from math import sqrt
 from statistics import mode,mean
-cap=cv2.VideoCapture(1)
 kernelOpen=np.ones((5,5))
 kernelClose=np.ones((20,20))
 crack_length=0
@@ -20,7 +19,7 @@ def findmean():
         crac=0
     return round(crac,1)
     
-while True:
+def crackdetection(frame)
     _,frame=cap.read()
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([-8,100,0])
@@ -43,13 +42,12 @@ while True:
             crack1=((l/b)*k)
         else:
             crack1=((b/l)*k)
-        print(crack1)
-
-        dataset.append(round(crack1,1))  
-    cv2.imshow('f',frame)
+        return frame,crack1
+        #dataset.append(round(crack1,1))  
+"""    cv2.imshow('f',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         cap.release()
         print(findmean())
-        break
+        break"""
 

@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import time 
 from math import sqrt
-#from shape_detect.shapedetector import ShapeDetector
+import Image_Recognisation.crackmeasurement as cr
 from statistics import mode,mean
 import threading
 import os
@@ -370,6 +370,7 @@ class Ui_MainWindow(object):
         cap = cv2.VideoCapture(0)
         while True:
                 ret,frame = cap.read()
+                frame,crackl=cr.crackdetection(frame)
                 self.putframe(frame)
                 #count=count+1
                 #time.sleep(.01)

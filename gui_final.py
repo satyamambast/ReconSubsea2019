@@ -3,7 +3,7 @@ import numpy as np
 import time 
 from math import sqrt
 #import pytesseract
-#from Task_Character_Detection.detect2 import *
+from Image_Recognisation..detect2 import *
 #from shape_detect.shapedetector import ShapeDetector
 from statistics import mode,mean
 import threading
