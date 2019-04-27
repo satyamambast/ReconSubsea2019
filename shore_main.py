@@ -32,6 +32,7 @@ RESIZED_IMAGE_WIDTH = 20
 RESIZED_IMAGE_HEIGHT = 30
 dataset=[]
 num=0
+msg1=[]
 i=0
 c=0
 mi=0
@@ -172,6 +173,11 @@ class Ui_MainWindow(object):
         self.label_2.setGeometry(QtCore.QRect(1060, 100, 261, 231))
         self.label_2.setStyleSheet("background: url(C:/Users/hp/Desktop/recon img.png)\n"
 "")
+        self.pushButton_7 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_7.setStyleSheet("background-color: rgb(230, 212, 255);\n"
+"font: 75 11pt \"MS Shell Dlg 2\";")
+        #self.pushButton_7.setToolTip('This is an example button')
+        self.pushButton_7.move(100,670)
         self.label_2.setText("")
         self.label_2.setObjectName("label_2")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -204,6 +210,7 @@ class Ui_MainWindow(object):
         self.pushButton_4.setText(_translate("MainWindow", "SHAPE DETECTION"))
         self.pushButton_5.setText(_translate("MainWindow", "MINI ROV LIVE FEED"))
         self.pushButton_6.setText(_translate("MainWindow", "CRACK DETECTION"))
+        self.pushButton_7.setText(_translate("MainWindow", "DISPLAY CRACK"))
         
    
     def putframe(self,frame):
@@ -223,8 +230,16 @@ class Ui_MainWindow(object):
         t4 = threading.Thread(target = self.shapesdetect)
         t4.start()
     def m1(self):
-        t5 = threading.Thread(target=self.crack)
-        t5.start()
+        #t5 = threading.Thread(target=self.crack)
+        #t5.start()
+        cap = cv2.VideoCapture(1)
+        while True:
+            _,frame=cap.read()
+            cv2.imshow('shape',frame)
+            if cv2.waitKey(1) & 0xFF==ord('r'):
+                cv2.destroyAllWindows()
+                break
+            
     def tim1(self):
         t6 = threading.Thread(target = self.tim)
         t6.start()
@@ -370,7 +385,7 @@ class Ui_MainWindow(object):
         cap = cv2.VideoCapture(0)
         while True:
                 ret,frame = cap.read()
-                frame,crackl=cr.crackdetection(frame)
+                #frame,crackl=cr.crackdetection(frame)
                 self.putframe(frame)
                 #count=count+1
                 #time.sleep(.01)
@@ -420,18 +435,13 @@ class Ui_MainWindow(object):
              return(sqrt((x1-x2)**2 + (y1-y2)**2))
     #def mini(self):
     def sensor(self):
-        global k1
-        sendata = []
-        arduinoData = serial.Serial('com3',9600)
+        global msg1
+        #arduinoData = serial.Serial('com3',9600)
         while True:
-            s = (arduinoData.readline().strip())
-            print(s)
-            rt =  s.decode('utf-8')
-            sendata.append(rt)
             if k1%2==0:
-                self.lcdNumber.display(str(sendata[k1]))
+                self.lcdNumber.display(4)
             else:
-                self.lcdNumber_2.display(str(sendata[k1]))
+                self.lcdNumber_2.display(msg1[0])
             k1=k1+1
 
 server_address = ('192.168.2.1', 5059)
@@ -511,7 +521,7 @@ def send_controller_data():
 def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     sock2.connect(('192.168.2.2',5058))
-    
+    global msg1
     while True:
         msg=sock2.recv(1024)
         if len(msg)>0 :

@@ -15,6 +15,6 @@ class ShapeDetector:
 			(x, y, w, h) = cv2.boundingRect(approx)
 			ar = w / float(h)
 			shape = "square" if ar >= 0.95 and ar <= 1.05 else "line"
-		else:
+		elif len(approx)>20:
 			shape = "circle"
 		return shape
