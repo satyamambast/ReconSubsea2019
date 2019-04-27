@@ -19,8 +19,7 @@ def findmean():
         crac=0
     return round(crac,1)
     
-def crackdetection(frame)
-    _,frame=cap.read()
+def crackdetection(frame):
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     lower = np.array([-8,100,0])
     upper = np.array([9,250,250])
@@ -44,6 +43,7 @@ def crackdetection(frame)
             crack1=((b/l)*k)
         return frame,crack1
         #dataset.append(round(crack1,1))  
+
 """    cv2.imshow('f',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
