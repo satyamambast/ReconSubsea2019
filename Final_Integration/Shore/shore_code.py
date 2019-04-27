@@ -124,8 +124,7 @@ def send_controller_data():
         
 def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock2.connect(('192.168.2.2',5058))
-    
+    sock2.connect(('192.168.2.2',5058))   
     while True:
         msg=sock2.recv(1024)
         if len(msg)>0 :
@@ -165,6 +164,7 @@ def recv_frame():
         obj.ret3=obj.__dict__[b'ret3']
         obj.ret4=obj.__dict__[b'ret4']
         obj.displayallfeeds()
+
 send_cont = threading.Thread(target = send_controller_data, args = ())
 recv_sense = threading.Thread(target = recv_sensor_values, args = ())
 recv_cam = threading.Thread(target = recv_frame, args = ())
