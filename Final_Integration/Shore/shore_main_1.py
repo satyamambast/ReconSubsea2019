@@ -47,6 +47,7 @@ num1=0
 i1=0
 i2=0
 num2=0
+database=[]
 from PyQt5 import QtCore, QtGui, QtWidgets
 class MultiCam:
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
@@ -184,12 +185,17 @@ class Ui_MainWindow(object):
         self.pushButton_8.setStyleSheet("background-color: rgb(230, 212, 255);\n"
 "font: 75 11pt \"MS Shell Dlg 2\";")
         #self.pushButton_7.setToolTip('This is an example button')
-        self.pushButton_8.move(300,670)
+        self.pushButton_8.move(500,670)
         self.pushButton_9 = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton_9.setStyleSheet("background-color: rgb(230, 212, 255);\n"
 "font: 75 11pt \"MS Shell Dlg 2\";")
         #self.pushButton_7.setToolTip('This is an example button')
-        self.pushButton_9.move(400,670)
+        self.pushButton_9.move(600,670)
+        self.pushButton_10 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_10.setStyleSheet("background-color: rgb(230, 212, 255);\n"
+"font: 75 11pt \"MS Shell Dlg 2\";")
+        #self.pushButton_7.setToolTip('This is an example button')
+        self.pushButton_10.move(300,670)
         self.label_2.setText("")
         self.label_2.setObjectName("label_2")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -204,7 +210,8 @@ class Ui_MainWindow(object):
         #self.pushButton.clicked.connect(self.tim1)
         self.pushButton_4.clicked.connect(self.m)
         self.pushButton_6.clicked.connect(self.m1)
-        self.pushButton_7.clicked.connect(self.borcam)
+        self.pushButton_7.clicked.connect(self.dispmode)
+        self.pushButton_5.clicked.connect(self.borcam)
         self.pushButton_8.clicked.connect(self.v1)
         self.pushButton_9.clicked.connect(self.v2)
         self.checkBox.clicked.connect(self.task2)
@@ -229,6 +236,7 @@ class Ui_MainWindow(object):
         self.pushButton_7.setText(_translate("MainWindow", "DISPLAY CRACK"))
         self.pushButton_8.setText(_translate("MainWindow", "V1"))
         self.pushButton_9.setText(_translate("MainWindow", "V2"))
+        self.pushButton_10.setText(_translate("MainWindow", "DISPLAY SHAPES"))
 
     def borcam():
         global bor
@@ -237,7 +245,7 @@ class Ui_MainWindow(object):
         while True:
             if obj.ret4:
                 cv2.imshow('borescope',obj.decode(obj.frame4))
-                cv2.waitKey(0) & 0xFF==('q'):
+                if cv2.waitKey(0) & 0xFF==('q'):
                     cv2.destroyAllWindows()
                     break
     def v1(self):
@@ -250,14 +258,21 @@ class Ui_MainWindow(object):
     def v2(self):
         global obj
         while obj.ret3:
-            cv2.imshow('View 2',obj.decode(obj.frame3))
+            cv2.imshow('View 2',obj.decode(obj.frame))
             if cv2.waitKey(1) & 0xFF==ord('r'):
                 cv2.destroyAllWindows()
                 break
     def putframe(self,frame):
         cv2.imwrite('frame.jpg',frame)
-        self.label.setPixmap(QtGui.QPixmap('frame.jpg'))
+        self.label.setPixmap(QtGui.QPixmap('frtame.jpg'))
         os.remove('frame.jpg')
+    def dispmode(self):
+        global database
+        if len(database)!=0:
+            crack_length=mode(database)
+            self.lcdNumber_7.display(crack_length)
+        else:
+            self.lcdNumber_7.display('nil')
     def livefeed(self):
         t1 = threading.Thread(target = self.x)
         t1.start()
@@ -269,9 +284,7 @@ class Ui_MainWindow(object):
         t3.start()
     def m(self):
         global obj
-        print("Kuch")
         while True:
-            print("Bhi")
             if obj.ret1:
                 shapes,frame=shape(obj.decode(obj.frame1))
                 print(shapes)
@@ -281,6 +294,7 @@ class Ui_MainWindow(object):
                     break
     def m1(self):
         global obj
+        global database
         #t5 = threading.Thread(target=self.crack)
         #t5.start()
         #cap = cv2.VideoCapture(0)
@@ -584,7 +598,7 @@ def recv_sensor_values():
 
 
 def recv_frame():
-    #HOST='192.168.2.1'
+    HOST='192.168.2.1'
     PORT=5004 
     s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     s.bind(('localhost',PORT))
