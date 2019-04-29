@@ -48,6 +48,7 @@ i1=0
 i2=0
 num2=0
 database=[]
+shapes={'circle':0,'line':0,'triangle':0,'square':0}
 from PyQt5 import QtCore, QtGui, QtWidgets
 class MultiCam:
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
@@ -214,12 +215,14 @@ class Ui_MainWindow(object):
         self.pushButton_5.clicked.connect(self.borcam)
         self.pushButton_8.clicked.connect(self.v1)
         self.pushButton_9.clicked.connect(self.v2)
+        self.pushButton_10.clicked.connect(self.shapes)
         self.checkBox.clicked.connect(self.task2)
         self.checkBox_2.clicked.connect(self.task3)
         self.checkBox_3.clicked.connect(self.task4)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
         self.tim1()
+        self.fg()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -280,14 +283,14 @@ class Ui_MainWindow(object):
         t2 = threading.Thread(target=self.y)
         t2.start()
     def fg(self):
-        t3 = threading.Thread(target = self.sen)
+        t3 = threading.Thread(target = self.sensor)
         t3.start()
     def m(self):
         global obj
+        global shapes
         while True:
             if obj.ret1:
                 shapes,frame=shape(obj.decode(obj.frame1))
-                print(shapes)
                 cv2.imshow('shape',frame)
                 if cv2.waitKey(1) & 0xFF==ord('r'):
                     cv2.destroyAllWindows()
@@ -306,7 +309,15 @@ class Ui_MainWindow(object):
             if cv2.waitKey(1) & 0xFF==ord('r'):
                 cv2.destroyAllWindows()
                 break
-            
+    def shapes(self):
+        global shapes
+        img=cv2.imread('shapes.jpg',cv2.IMREAD_COLOR)
+        cv2.putText(img, str(shapes['circle']), (100, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA) 
+        cv2.putText(img, str(shapes['triangle']), (100, 150), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
+        cv2.putText(img, str(shapes['line']), (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
+        cv2.putText(img, str(shapes['square']), (100, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
+        cv2.imshow('img',img)
+        cv2.waitKey(0)
     def tim1(self):
         t6 = threading.Thread(target = self.tim)
         t6.start()
@@ -419,35 +430,7 @@ class Ui_MainWindow(object):
         if clk==3:
             self.lcdNumber_6.display(str(num-num3)+":"+str(i-i3))
         time.sleep(1)
-    def shapesdetect(self):
-        cv2.destroyAllWindows()
-        cap = cv2.VideoCapture(1)
-        while True:
-                    ret,frame = cap.read()
-                    hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-                    lower = np.array([0,0,0])
-                    upper = np.array([180,255,30])
-                    mask = cv2.inRange(hsv, lower, upper)
-                    res = cv2.bitwise_and(frame,frame, mask= mask)
-                    maskOpen=cv2.morphologyEx(mask,cv2.MORPH_OPEN,kernelOpen)
-                    maskClose=cv2.morphologyEx(maskOpen,cv2.MORPH_CLOSE,kernelClose)
-                    maskFinal=maskClose
-                    _,conts,h=cv2.findContours(maskFinal.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_NONE)
-                    cv2.drawContours(frame,conts,-1,(230,0,0),3)
-                    sd = ShapeDetector()
-                    shapesf=dict()
-                    for c in conts:
-                      shape = sd.detect(c)
-                      if shape in shapesf:
-                         shapesf[shape]+=1
-                      else:
-                         shapesf[shape]=1
-                    print(shapesf)      
-                    cv2.imshow('shape',frame)
-                    if cv2.waitKey(1) & 0xFF==ord('r'):
-                        break
-        cv2.destroyAllWindows()
-        cap.release()
+
     def x(self):
         global count
         global obj
@@ -502,12 +485,13 @@ class Ui_MainWindow(object):
     #def mini(self):
     def sensor(self):
         global msg1
+        k1=0
         #arduinoData = serial.Serial('com3',9600)
         while True:
             if k1%2==0:
-                self.lcdNumber.display(msg1[0])
+                self.lcdNumber_2.display(msg1[0])
             else:
-                self.lcdNumber_2.display(msg1[1])
+                self.lcdNumber_3.display(msg1[1])
             k1=k1+1
 
 server_address = ('192.168.2.1', 5059)
@@ -631,11 +615,11 @@ def recv_frame():
 
 
 if __name__=="__main__":
-    #send_cont = threading.Thread(target = send_controller_data, args = ())
-    #recv_sense = threading.Thread(target = recv_sensor_values, args = ())
+    send_cont = threading.Thread(target = send_controller_data, args = ())
+    recv_sense = threading.Thread(target = recv_sensor_values, args = ())
     recv_cam = threading.Thread(target = recv_frame, args = ())
-    #send_cont.start()
-    #recv_sense.start()
+    send_cont.start()
+    recv_sense.start()
     recv_cam.start()
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
