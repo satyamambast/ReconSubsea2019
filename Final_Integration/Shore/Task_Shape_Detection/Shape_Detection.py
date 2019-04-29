@@ -27,6 +27,6 @@ def shape(frame):
                 shapesf[shape]+=1
         else:
             shapesf[shape]=1
-    print(shapesf)      
-    cv2.imshow('frame',frame)
+    return shapes,frame      
+    #cv2.imshow('frame',frame)
     

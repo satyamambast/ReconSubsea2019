@@ -39,6 +39,7 @@ def crack(frame):
         else:
             crack1=((b/l)*k)
         print(crack1)
-    cv2.imshow('crack',frame)
+    return crack1,frame
+    #cv2.imshow('crack',frame)
 
 

@@ -19,6 +19,7 @@ import sys
 from Task_Crack_Detection.crackmeasurement import crack
 from Task_Shape_Detection.Shape_Detection import shape
 #from Task_Text_Detection.text_detect import *
+bor=0
 count=0
 cnt=0
 config = ('-l eng --oem 1 --psm 3')
@@ -87,6 +88,7 @@ class MultiCam:
         h,w = frame.shape[:2]
         framea=cv2.resize(frame,(2*w,2*h), interpolation = cv2.INTER_LINEAR)
         return framea
+obj=MultiCam()
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -178,6 +180,16 @@ class Ui_MainWindow(object):
 "font: 75 11pt \"MS Shell Dlg 2\";")
         #self.pushButton_7.setToolTip('This is an example button')
         self.pushButton_7.move(100,670)
+        self.pushButton_8 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_8.setStyleSheet("background-color: rgb(230, 212, 255);\n"
+"font: 75 11pt \"MS Shell Dlg 2\";")
+        #self.pushButton_7.setToolTip('This is an example button')
+        self.pushButton_8.move(300,670)
+        self.pushButton_9 = QtWidgets.QPushButton(self.centralwidget)
+        self.pushButton_9.setStyleSheet("background-color: rgb(230, 212, 255);\n"
+"font: 75 11pt \"MS Shell Dlg 2\";")
+        #self.pushButton_7.setToolTip('This is an example button')
+        self.pushButton_9.move(400,670)
         self.label_2.setText("")
         self.label_2.setObjectName("label_2")
         MainWindow.setCentralWidget(self.centralwidget)
@@ -189,14 +201,18 @@ class Ui_MainWindow(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
         self.pushButton.clicked.connect(self.livefeed)
-        self.pushButton.clicked.connect(self.tim1)
+        #self.pushButton.clicked.connect(self.tim1)
         self.pushButton_4.clicked.connect(self.m)
         self.pushButton_6.clicked.connect(self.m1)
+        self.pushButton_7.clicked.connect(self.borcam)
+        self.pushButton_8.clicked.connect(self.v1)
+        self.pushButton_9.clicked.connect(self.v2)
         self.checkBox.clicked.connect(self.task2)
         self.checkBox_2.clicked.connect(self.task3)
         self.checkBox_3.clicked.connect(self.task4)
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        self.tim1()
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -211,8 +227,33 @@ class Ui_MainWindow(object):
         self.pushButton_5.setText(_translate("MainWindow", "MINI ROV LIVE FEED"))
         self.pushButton_6.setText(_translate("MainWindow", "CRACK DETECTION"))
         self.pushButton_7.setText(_translate("MainWindow", "DISPLAY CRACK"))
-        
-   
+        self.pushButton_8.setText(_translate("MainWindow", "V1"))
+        self.pushButton_9.setText(_translate("MainWindow", "V2"))
+
+    def borcam():
+        global bor
+        global obj
+        bor=1
+        while True:
+            if obj.ret4:
+                cv2.imshow('borescope',obj.decode(obj.frame4))
+                cv2.waitKey(0) & 0xFF==('q'):
+                    cv2.destroyAllWindows()
+                    break
+    def v1(self):
+        global obj
+        while obj.ret2:
+            cv2.imshow('View 1',obj.decode(obj.frame2))
+            if cv2.waitKey(1) & 0xFF==ord('r'):
+                cv2.destroyAllWindows()
+                break
+    def v2(self):
+        global obj
+        while obj.ret3:
+            cv2.imshow('View 2',obj.decode(obj.frame3))
+            if cv2.waitKey(1) & 0xFF==ord('r'):
+                cv2.destroyAllWindows()
+                break
     def putframe(self,frame):
         cv2.imwrite('frame.jpg',frame)
         self.label.setPixmap(QtGui.QPixmap('frame.jpg'))
@@ -227,15 +268,27 @@ class Ui_MainWindow(object):
         t3 = threading.Thread(target = self.sen)
         t3.start()
     def m(self):
-        t4 = threading.Thread(target = self.shapesdetect)
-        t4.start()
+        global obj
+        print("Kuch")
+        while True:
+            print("Bhi")
+            if obj.ret1:
+                shapes,frame=shape(obj.decode(obj.frame1))
+                print(shapes)
+                cv2.imshow('shape',frame)
+                if cv2.waitKey(1) & 0xFF==ord('r'):
+                    cv2.destroyAllWindows()
+                    break
     def m1(self):
+        global obj
         #t5 = threading.Thread(target=self.crack)
         #t5.start()
-        cap = cv2.VideoCapture(0)
+        #cap = cv2.VideoCapture(0)
         while True:
-            _,frame=cap.read()
+            #_,frame=cap.read()
+            crack,frame=crack(obj.frame2)
             cv2.imshow('shape',frame)
+            database.append(crack)
             if cv2.waitKey(1) & 0xFF==ord('r'):
                 cv2.destroyAllWindows()
                 break
@@ -250,7 +303,8 @@ class Ui_MainWindow(object):
             if i<10:
                 self.lcdNumber.display(str(num)+":0"+str(i))
             else:
-                self.lcdNumber.display(str(num)+":"+str(i))
+              1
+              self.lcdNumber.display(str(num)+":"+str(i))
             
             if i==60:
                 num = num+1
@@ -382,14 +436,12 @@ class Ui_MainWindow(object):
         cap.release()
     def x(self):
         global count
-        cap = cv2.VideoCapture(0)
+        global obj
+        #cap = cv2.VideoCapture(0)
         while True:
-                ret,frame = cap.read()
-                #frame,crackl=cr.crackdetection(frame)
-                self.putframe(frame)
                 #count=count+1
                 #time.sleep(.01)
-                #cv2.imshow('frame0',frame)
+                self.putframe(obj.decode(obj.frame1))
                 #k=cv2.waitKey(1)
                 #if k==1:
                     #break
@@ -498,7 +550,7 @@ def get():
     out[3]=out[3]*10
     out[4]=out[4]*10
     #s=str(out).strip('[]')
-    s=out
+    s=out.append[bor]
     data = pickle.dumps(s,1)
     return data
 
@@ -532,15 +584,15 @@ def recv_sensor_values():
 
 
 def recv_frame():
-    HOST='192.168.2.1'
-    PORT=5003    
+    #HOST='192.168.2.1'
+    PORT=5004 
     s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.bind((HOST,PORT))
+    s.bind(('localhost',PORT))
     s.listen(10)
     conn,addr=s.accept()
     data = b""
     payload_size = struct.calcsize(">L")
-
+    global obj
     while True:
         while len(data) < payload_size:
             data += conn.recv(4096)
@@ -552,6 +604,7 @@ def recv_frame():
         frame_data = data[:msg_size]
         data = data[msg_size:]
         obj=pickle.loads(frame_data,encoding='bytes')
+        #print(obj.__dict__)
         obj.frame1=obj.__dict__[b'frame1']
         obj.frame2=obj.__dict__[b'frame2']
         obj.frame3=obj.__dict__[b'frame3']
@@ -560,15 +613,15 @@ def recv_frame():
         obj.ret2=obj.__dict__[b'ret2']
         obj.ret3=obj.__dict__[b'ret3']
         obj.ret4=obj.__dict__[b'ret4']
-        obj.displayallfeeds()
+        #obj.displayallfeeds()
 
 
 if __name__=="__main__":
-    send_cont = threading.Thread(target = send_controller_data, args = ())
-    recv_sense = threading.Thread(target = recv_sensor_values, args = ())
+    #send_cont = threading.Thread(target = send_controller_data, args = ())
+    #recv_sense = threading.Thread(target = recv_sensor_values, args = ())
     recv_cam = threading.Thread(target = recv_frame, args = ())
-    send_cont.start()
-    recv_sense.start()
+    #send_cont.start()
+    #recv_sense.start()
     recv_cam.start()
     app = QtWidgets.QApplication(sys.argv)
     MainWindow = QtWidgets.QMainWindow()
