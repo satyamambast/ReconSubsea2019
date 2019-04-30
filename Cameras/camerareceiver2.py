@@ -7,7 +7,7 @@ import struct
 import zlib
 
 HOST=''
-PORT=8487
+PORT=8888
 
 s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
 print('Socket created')
