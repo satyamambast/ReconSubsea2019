@@ -48,7 +48,7 @@ i1=0
 i2=0
 num2=0
 database=[]
-shapes={'circle':0,'line':0,'triangle':0,'square':0}
+shapesdict={'circle':0,'line':0,'triangle':0,'square':0}
 from PyQt5 import QtCore, QtGui, QtWidgets
 class MultiCam:
     encode_param = [int(cv2.IMWRITE_JPEG_QUALITY), 90]
@@ -215,7 +215,7 @@ class Ui_MainWindow(object):
         self.pushButton_5.clicked.connect(self.borcam)
         self.pushButton_8.clicked.connect(self.v1)
         self.pushButton_9.clicked.connect(self.v2)
-        self.pushButton_10.clicked.connect(self.shapes)
+        self.pushButton_10.clicked.connect(self.displayshapes)
         self.checkBox.clicked.connect(self.task2)
         self.checkBox_2.clicked.connect(self.task3)
         self.checkBox_3.clicked.connect(self.task4)
@@ -241,16 +241,22 @@ class Ui_MainWindow(object):
         self.pushButton_9.setText(_translate("MainWindow", "V2"))
         self.pushButton_10.setText(_translate("MainWindow", "DISPLAY SHAPES"))
 
-    def borcam():
+    def borcam(self):
         global bor
         global obj
         bor=1
-        while True:
-            if obj.ret4:
+        time.sleep(3)
+        if obj.ret4:
+            while True:
                 cv2.imshow('borescope',obj.decode(obj.frame4))
-                if cv2.waitKey(0) & 0xFF==('q'):
+                if cv2.waitKey(1) & 0xFF==('q'):
+                    bor=0
                     cv2.destroyAllWindows()
                     break
+        else:
+            print(obj.ret1)
+            bor=0
+            
     def v1(self):
         global obj
         while obj.ret2:
@@ -261,19 +267,20 @@ class Ui_MainWindow(object):
     def v2(self):
         global obj
         while obj.ret3:
-            cv2.imshow('View 2',obj.decode(obj.frame))
+            cv2.imshow('View 2',obj.decode(obj.frame3))
             if cv2.waitKey(1) & 0xFF==ord('r'):
                 cv2.destroyAllWindows()
                 break
     def putframe(self,frame):
         cv2.imwrite('frame.jpg',frame)
-        self.label.setPixmap(QtGui.QPixmap('frtame.jpg'))
+        self.label.setPixmap(QtGui.QPixmap('frame.jpg'))
         os.remove('frame.jpg')
     def dispmode(self):
         global database
         if len(database)!=0:
-            crack_length=mode(database)
-            self.lcdNumber_7.display(crack_length)
+            crack_l=mode(database)
+            print(crack_l)
+            self.lcdNumber_7.display(crack_l)
         else:
             self.lcdNumber_7.display('nil')
     def livefeed(self):
@@ -287,10 +294,11 @@ class Ui_MainWindow(object):
         t3.start()
     def m(self):
         global obj
-        global shapes
-        while True:
-            if obj.ret1:
-                shapes,frame=shape(obj.decode(obj.frame1))
+        global shapesdict
+        if obj.ret2:
+            print('loop')
+            while True:
+                shapesdict,frame=shape(obj.decode(obj.frame2))
                 cv2.imshow('shape',frame)
                 if cv2.waitKey(1) & 0xFF==ord('r'):
                     cv2.destroyAllWindows()
@@ -298,26 +306,26 @@ class Ui_MainWindow(object):
     def m1(self):
         global obj
         global database
-        #t5 = threading.Thread(target=self.crack)
-        #t5.start()
-        #cap = cv2.VideoCapture(0)
         while True:
-            #_,frame=cap.read()
-            crack,frame=crack(obj.frame2)
-            cv2.imshow('shape',frame)
-            database.append(crack)
+            crack_length,frame=crack(obj.decode(obj.frame2))
+            cv2.imshow('crack',frame)
+            database.append(round(crack_length,1))
             if cv2.waitKey(1) & 0xFF==ord('r'):
                 cv2.destroyAllWindows()
                 break
-    def shapes(self):
-        global shapes
-        img=cv2.imread('shapes.jpg',cv2.IMREAD_COLOR)
-        cv2.putText(img, str(shapes['circle']), (100, 50), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA) 
-        cv2.putText(img, str(shapes['triangle']), (100, 150), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
-        cv2.putText(img, str(shapes['line']), (100, 250), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
-        cv2.putText(img, str(shapes['square']), (100, 350), cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 0, 255), lineType=cv2.LINE_AA)
+            
+    def displayshapes(self):
+        global shapesdict
+        print(shapesdict)
+        img=cv2.imread("shapes.jpg",cv2.IMREAD_COLOR)
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(img,str(shapesdict['circle']),(100,50), font, 1.0,(0,0,255),2,cv2.LINE_AA)
+        cv2.putText(img,str(shapesdict['triangle']),(100,150), font, 1.0,(0,0,255),2,cv2.LINE_AA)
+        cv2.putText(img,str(shapesdict['line']),(100,250), font, 1.0,(0,0,255),2,cv2.LINE_AA)
+        cv2.putText(img,str(shapesdict['square']),(100,350), font, 1.0,(0,0,255),2,cv2.LINE_AA)
         cv2.imshow('img',img)
         cv2.waitKey(0)
+        
     def tim1(self):
         t6 = threading.Thread(target = self.tim)
         t6.start()
@@ -436,12 +444,13 @@ class Ui_MainWindow(object):
         global obj
         #cap = cv2.VideoCapture(0)
         while True:
-                #count=count+1
-                #time.sleep(.01)
-                self.putframe(obj.decode(obj.frame1))
-                #k=cv2.waitKey(1)
-                #if k==1:
-                    #break
+            #count=count+1
+            #time.sleep(.01)
+            self.putframe(obj.decode(obj.frame1))
+
+            #k=cv2.waitKey(1)
+            #if k==1:
+                #break
         cv2.destroyAllWindows()
         cap.release()
     '''def crack(self):
@@ -548,8 +557,9 @@ def get():
     out[3]=out[3]*10
     out[4]=out[4]*10
     #s=str(out).strip('[]')
-    s=out.append[bor]
-    data = pickle.dumps(s,1)
+    out.append(bor)
+    #print(out)
+    data = pickle.dumps(out,1)
     return data
 
 
@@ -570,13 +580,13 @@ def send_controller_data():
         
 def recv_sensor_values():
     sock2=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    sock2.connect(('192.168.2.2',5058))
+    sock2.connect(('192.168.2.2',5070))
     global msg1
     while True:
         msg=sock2.recv(1024)
         if len(msg)>0 :
             msg1 = pickle.loads(msg,encoding='bytes')
-            print("Received:",msg1)
+            #print("Received:",msg1)
         time.sleep(.01)
 
 
@@ -585,7 +595,7 @@ def recv_frame():
     HOST='192.168.2.1'
     PORT=5004 
     s=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-    s.bind(('localhost',PORT))
+    s.bind((HOST,PORT))
     s.listen(10)
     conn,addr=s.accept()
     data = b""
@@ -615,6 +625,7 @@ def recv_frame():
 
 
 if __name__=="__main__":
+    time.sleep(2)
     send_cont = threading.Thread(target = send_controller_data, args = ())
     recv_sense = threading.Thread(target = recv_sensor_values, args = ())
     recv_cam = threading.Thread(target = recv_frame, args = ())

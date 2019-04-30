@@ -39,7 +39,13 @@ def crack(frame):
         else:
             crack1=((b/l)*k)
         print(crack1)
-    return crack1,frame
+        return crack1,frame
+    return 0,frame
     #cv2.imshow('crack',frame)
-
-
+"""c=cv2.VideoCapture(0)
+while True:
+    _,frame=c.read()
+    cracklength,frame1=crack(frame)
+    cv2.imshow('f',frame1)
+    cv2.waitKey(1)
+"""
